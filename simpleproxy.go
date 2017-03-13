@@ -6,12 +6,15 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/skratchdot/open-golang/open"
 )
 
 var (
-	addr = flag.String("addr", ":6600", "address to listed on")
+	port = flag.String("port", "6600", "address to listed on")
 	user = flag.String("username", "", "username for basic authentication")
 	pass = flag.String("password", "", "password for basic authentication")
+	o    = flag.Bool("o", false, "open the proxy in the browser")
 )
 
 func main() {
@@ -27,7 +30,7 @@ func main() {
 		log.Fatalln("error parsing target:", err)
 	}
 
-	log.Printf("Proxying to %s on %s", tgt.String(), *addr)
+	log.Printf("Proxying to %s on port %s", tgt.String(), *port)
 
 	proxy := httputil.NewSingleHostReverseProxy(tgt)
 	if *user != "" || *pass != "" {
@@ -37,7 +40,13 @@ func main() {
 		}
 	}
 
-	log.Fatal(http.ListenAndServe(*addr, proxy))
+	if *o {
+		go func() {
+			open.Run("http://localhost:" + *port)
+		}()
+	}
+
+	log.Fatal(http.ListenAndServe(":"+*port, proxy))
 }
 
 // based on net/http/httputil internals
