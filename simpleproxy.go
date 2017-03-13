@@ -9,20 +9,20 @@ import (
 )
 
 var (
-	target = flag.String("target", "", "proxy target")
-	addr   = flag.String("addr", ":6600", "address to listed on")
-	user   = flag.String("username", "", "username for basic authentication")
-	pass   = flag.String("password", "", "password for basic authentication")
+	addr = flag.String("addr", ":6600", "address to listed on")
+	user = flag.String("username", "", "username for basic authentication")
+	pass = flag.String("password", "", "password for basic authentication")
 )
 
 func main() {
 	flag.Parse()
 
-	if *target == "" {
-		log.Fatal("Specify a proxy with the -target flag")
+	target := flag.Arg(0)
+	if target == "" {
+		log.Fatal("Specify a proxy target as a command line argument")
 	}
 
-	tgt, err := url.Parse(*target)
+	tgt, err := url.Parse(target)
 	if err != nil {
 		log.Fatalln("error parsing target:", err)
 	}
